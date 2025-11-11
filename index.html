@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Supermercado</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <i class="fas fa-shopping-cart"></i>
+                <h1>Punto de Venta</h1>
+                <p>Sistema de Supermercado</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Usuario</label>
+                    <input type="text" id="loginUsername" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-shopping-cart"></i>
+                <h2>POS Sistema</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-section="pos">
+                    <i class="fas fa-cash-register"></i>
+                    <span>Punto de Venta</span>
+                </a>
+                <a href="#" class="nav-link" data-section="inventario">
+                    <i class="fas fa-boxes"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#" class="nav-link" data-section="compras">
+                    <i class="fas fa-truck"></i>
+                    <span>Compras</span>
+                </a>
+                <a href="#" class="nav-link" data-section="devoluciones">
+                    <i class="fas fa-undo"></i>
+                    <span>Devoluciones</span>
+                </a>
+                <a href="#" class="nav-link" data-section="reportes">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Usuario</span>
+                </div>
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Salir
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="app-header">
+                <h1 id="sectionTitle">Punto de Venta</h1>
+                <div class="header-info">
+                    <div class="info-item">
+                        <i class="fas fa-calendar"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- SECCIÓN: PUNTO DE VENTA -->
+            <section id="section-pos" class="content-section active">
+                <div class="pos-container">
+                    <!-- BÚSQUEDA Y PRODUCTOS -->
+                    <div class="pos-left">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchProduct" placeholder="Buscar producto por nombre o código...">
+                        </div>
+                        
+                        <div class="product-grid" id="productGrid">
+                            <!-- Productos se cargan aquí -->
+                        </div>
+                    </div>
+
+                    <!-- CARRITO Y TOTAL -->
+                    <div class="pos-right">
+                        <div class="cart-container">
+                            <h3><i class="fas fa-shopping-cart"></i> Carrito de Compra</h3>
+                            <div class="cart-items" id="cartItems">
+                                <p class="cart-empty">No hay productos en el carrito</p>
+                            </div>
+                        </div>
+
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="cartSubtotal">$0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>TOTAL:</span>
+                                <span id="cartTotal">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="payment-section">
+                            <h4>Forma de Pago</h4>
+                            <div class="payment-options" id="paymentOptions">
+                                <!-- Se cargan dinámicamente -->
+                            </div>
+                            
+                            <div class="payment-amounts">
+                                <div class="form-group">
+                                    <label>Monto Recibido:</label>
+                                    <input type="number" id="montoRecibido" step="0.01" min="0" placeholder="0.00">
+                                </div>
+                                <div class="cambio-display">
+                                    <span>Cambio:</span>
+                                    <span id="cambioAmount">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="btnClearCart" class="btn btn-secondary">
+                                <i class="fas fa-trash"></i> Limpiar
+                            </button>
+                            <button id="btnFinalizarVenta" class="btn btn-success">
+                                <i class="fas fa-check"></i> Cobrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: INVENTARIO -->
+            <section id="section-inventario" class="content-section">
+                <div class="section-header">
+                    <button id="btnNuevoProducto" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </button>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInventario" placeholder="Buscar en inventario...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Precio Costo</th>
+                                <th>Precio Venta</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventarioTable">
+                            <!-- Se carga dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: COMPRAS -->
+            <section id="section-compras" class="content-section">
+                <div class="compras-container">
+                    <div class="form-card">
+                        <h3>Nueva Compra a Proveedor</h3>
+                        <form id="formCompra">
+                            <div class="form-group">
+                                <label>Proveedor:</label>
+                                <select id="selectProveedor" required>
+                                    <option value="">Seleccione un proveedor</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Observaciones:</label>
+                                <textarea id="observacionesCompra" rows="2"></textarea>
+                            </div>
+
+                            <h4>Productos a Comprar</h4>
+                            <div id="compraProductos">
+                                <div class="compra-producto-row">
+                                    <select class="producto-select" required>
+                                        <option value="">Seleccione producto</option>
+                                    </select>
+                                    <input type="number" class="cantidad-input" placeholder="Cantidad" min="1" required>
+                                    <input type="number" class="precio-input" placeholder="Precio Costo" step="0.01" min="0" required>
+                                    <button type="button" class="btn-remove-producto"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnAgregarProductoCompra" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> Agregar Producto
+                            </button>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check"></i> Registrar Compra
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: DEVOLUCIONES -->
+            <section id="section-devoluciones" class="content-section">
+                <div class="devoluciones-container">
+                    <div class="form-card">
+                        <h3>Procesar Devolución</h3>
+                        <form id="formDevolucion">
+                            <div class="form-group">
+                                <label>ID de Venta:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="ventaIDDevolucion" min="1" required style="flex: 1;">
+                                    <button type="button" id="btnBuscarVenta" class="btn btn-secondary">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="ventaInfo" style="display: none;">
+                                <div class="info-card" style="background: #f5f7fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                    <h4>Información de la Venta</h4>
+                                    <p><strong>Fecha:</strong> <span id="ventaFecha"></span></p>
+                                    <p><strong>Total:</strong> <span id="ventaTotal"></span></p>
+                                    <p><strong>Cajero:</strong> <span id="ventaCajero"></span></p>
+                                </div>
+
+                                <h4>Productos de la Venta</h4>
+                                <div id="ventaProductos" style="margin-bottom: 20px;"></div>
+
+                                <div class="form-group">
+                                    <label>Motivo de Devolución:</label>
+                                    <textarea id="motivoDevolucion" rows="3" required></textarea>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-undo"></i> Procesar Devolución
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN: REPORTES -->
+            <section id="section-reportes" class="content-section">
+                <div class="reportes-grid">
+                    <!-- Dashboard del Día -->
+                    <div class="report-card">
+                        <h3><i class="fas fa-chart-line"></i> Resumen del Día</h3>
+                        <div id="dashboardDelDia">
+                            <div class="stat-item">
+                                <span>Ventas:</span>
+                                <span id="statVentas">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Monto Ventas:</span>
+                                <span id="statMontoVentas">$0.00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Compras:</span>
+                                <span id="statCompras">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>Productos Stock Bajo:</span>
+                                <span id="statStockBajo" class="text-warning">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos Más Vendidos -->
+                    <div class="report-card">
+                        <h3><i class="fas fa-trophy"></i> Top 5 Productos Más Vendidos</h3>
+                        <div id="topProductos" class="list-container">
+                            <!-- Se carga dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Stock Bajo -->
+                    <div class="report-card">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Alertas de Stock</h3>
+                        <div id="alertasStock" class="list-container">
+                            <!-- Se carga dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Ventas del Día -->
+                    <div class="report-card full-width">
+                        <h3><i class="fas fa-receipt"></i> Ventas de Hoy</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha/Hora</th>
+                                        <th>Total</th>
+                                        <th>Artículos</th>
+                                        <th>Cajero</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ventasHoyTable">
+                                    <!-- Se carga dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: NUEVO/EDITAR PRODUCTO -->
+    <div id="modalProducto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalProductoTitle">Nuevo Producto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="formProducto">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Código de Barras:</label>
+                        <input type="text" id="productoCodigoBarras" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="productoNombre" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="productoDescripcion" rows="2"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoría:</label>
+                        <select id="productoCategoria" required>
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Costo:</label>
+                        <input type="number" id="productoPrecioCosto" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio Venta:</label>
+                        <input type="number" id="productoPrecioVenta" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Inicial:</label>
+                        <input type="number" id="productoStockInicial" step="0.01" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Stock Mínimo:</label>
+                    <input type="number" id="productoStockMinimo" step="0.01" min="0" value="0">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-close">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div id="notificationContainer"></div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pos.js"></script>
+    <script src="js/inventario.js"></script>
+    <script src="js/compras.js"></script>
+    <script src="js/devoluciones.js"></script>
+    <script src="js/reportes.js"></script>
+</body>
+</html>
