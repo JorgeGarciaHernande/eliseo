@@ -315,7 +315,7 @@ app.get('/api/ventas/:id', async (req, res) => {
         const detalle = await pool.request()
             .input('ventaID', sql.Int, id)
             .query(`
-                SELECT P.NombreProducto, DV.Cantidad, DV.PrecioUnitario, DV.Subtotal
+                SELECT  DV.ProductoID,P.NombreProducto, DV.Cantidad,DV.CantidadDevuelta, DV.PrecioUnitario, DV.Subtotal
                 FROM DetalleVentas DV
                 INNER JOIN Productos P ON DV.ProductoID = P.ProductoID
                 WHERE DV.VentaID = @ventaID

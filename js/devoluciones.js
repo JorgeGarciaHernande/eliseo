@@ -36,7 +36,7 @@ async function buscarVenta() {
             document.getElementById('ventaInfo').style.display = 'none';
         }
     } catch (error) {
-        showNotification('Error buscando venta', 'error');
+        showNotification('Error buscano venta', 'error');
         ventaActual = null;
         document.getElementById('ventaInfo').style.display = 'none';
     }
@@ -123,14 +123,21 @@ async function procesarDevolucion(e) {
         const cantidad = parseInt(cantidadInput.value);
         const producto = ventaActual.detalle[index];
         
-        // Buscar el ProductoID original
-        const productoOriginal = ventaActual.detalle[index];
+        console.log('Producto para devolución:', producto); // DEBUG
+        
+        if (!producto.ProductoID) {
+            console.error('ERROR: ProductoID no existe en el detalle', producto);
+            showNotification('Error: Datos de producto incompletos', 'error');
+            return;
+        }
         
         productos.push({
-            productoID: producto.ProductoID || index + 1, // Ajustar según tu estructura
+            productoID: producto.ProductoID,
             cantidad
         });
     });
+    
+    console.log('Productos a devolver:', productos); // DEBUG
     
     const devolucion = {
         ventaID: parseInt(document.getElementById('ventaIDDevolucion').value),
@@ -138,6 +145,8 @@ async function procesarDevolucion(e) {
         motivo,
         productos
     };
+    
+    console.log('Devolucion completa:', devolucion); // DEBUG
     
     try {
         const response = await API.registrarDevolucion(devolucion);
@@ -148,6 +157,7 @@ async function procesarDevolucion(e) {
             ventaActual = null;
         }
     } catch (error) {
+        console.error('Error completo:', error); // DEBUG
         showNotification(error.message || 'Error procesando devolución', 'error');
     }
 }
